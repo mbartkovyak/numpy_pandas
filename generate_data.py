@@ -3,7 +3,7 @@ from typing import List
 from datetime import datetime
 
 
-import faker
+import faker, random
 
 # Use the faker library to generate a dataset for "Restaurant Reviews." Each entry in the dataset should include the following fields:
 #
@@ -33,32 +33,33 @@ def generate_restaurant_reviews() -> List[RestaurantReview]:
     start_date = datetime.strptime("2020-01-01", "%Y-%m-%d").date()
     end_date = datetime.strptime("2023-12-31", "%Y-%m-%d").date()
 
+    # Decide on the number of unique names, locations, etc.
+    unique_restaurant_names = 100  # For example, 100 unique restaurant names
+    unique_reviewer_names = 30  # For example, 300 unique reviewer names
+    unique_locations = 50  # For example, 50 unique locations
+
+    # Generate unique names and locations
+    restaurant_names = [fake.company() for _ in range(unique_restaurant_names)]
+    reviewer_names = [fake.name() for _ in range(unique_reviewer_names)]
+    locations = [fake.city() for _ in range(unique_locations)]
+
+    restaurants = []
     for i in range(500):
         restaurant = RestaurantReview(
             id=i,
-            restaurant_name=fake.company(),  # Assuming restaurant names are like company names
-            reviewer_name=fake.name(),
+            restaurant_name=random.choice(restaurant_names),  # Randomly reuse restaurant names
+            reviewer_name=random.choice(reviewer_names),  # Randomly reuse reviewer names
             reviewer_text=fake.text(max_nb_chars=200),  # Generate fake review texts up to 200 characters
             rating=fake.random_element(elements=(1, 2, 3, 4, 5)),  # Assuming ratings are integers from 1 to 5
             date_of_visit=fake.date_between(start_date=start_date, end_date=end_date),
-            location=fake.city()
+            location=random.choice(locations)  # Randomly reuse locations
         )
         restaurants.append(restaurant)
 
+    for restaurant in fake.random_elements(elements=restaurants, length=int(len(restaurants) * 0.01), unique=True):
+        restaurant.rating = None
+
     return restaurants
-
-    # # For the 1% of random students, set the average mark to None
-    # for student in fake.random_elements(elements=students, length=int(len(students) * 0.01)):
-    #     student.average_mark = None
-    #
-    # return students
-def save_restaurants_to_csv(restaurants: List[RestaurantReview]):
-    with open('students.csv', 'w') as f:
-        f.write('id,first_name,last_name,birth_date,average_mark,count_of_lessons_absent,count_of_lessons_sick,gender,city\n')
-
-        for student in students:
-            f.write(f'{student.id},{student.first_name},{student.last_name},{student.birth_date},{student.average_mark},{student.count_of_lessons_absent},{student.count_of_lessons_sick},{student.gender},{student.city}\n')
-
 
 def save_restaurants_to_csv(restaurants: List[RestaurantReview]):
     with open('restaurants_reviews.csv', 'w', newline='', encoding='utf-8') as f:
@@ -71,3 +72,4 @@ def save_restaurants_to_csv(restaurants: List[RestaurantReview]):
 if __name__ == '__main__':
     restaurants = generate_restaurant_reviews()
     save_restaurants_to_csv(restaurants)
+
